@@ -1,17 +1,16 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  mod_tags_popular
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 defined('_JEXEC') or die;
 
 ?>
 <?php JLoader::register('TagsHelperRoute', JPATH_BASE . '/components/com_tags/helpers/route.php'); ?>
-<div class="tagssimilar<?php echo $moduleclass_sfx; ?>">
+<div class="tagssimilar">
 <?php if ($list) : ?>
 	<ul>
 	<?php foreach ($list as $i => $item) : ?>

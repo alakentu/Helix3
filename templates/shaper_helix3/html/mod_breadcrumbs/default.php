@@ -1,19 +1,15 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  mod_breadcrumbs
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 defined('_JEXEC') or die;
-
-JHtml::_('bootstrap.tooltip');
-
 ?>
 
-<ol class="breadcrumb<?php echo $moduleclass_sfx; ?>">
+<ol class="breadcrumb">
 	<?php
 	if ($params->get('showHere', 1))
 	{
@@ -21,7 +17,7 @@ JHtml::_('bootstrap.tooltip');
 	}
 	else
 	{
-		echo '<li><i class="fa fa-home"></i></li>';
+		echo '<li class="breadcrumb-item"><i class="fa fa-home"></i></li>';
 	}
 
 	// Get rid of duplicated entries on trail including home page when using multilanguage
@@ -42,7 +38,7 @@ JHtml::_('bootstrap.tooltip');
 
 	foreach ($list as $key => $item) {
 		if ($key != $last_item_key) {
-			echo '<li>';
+			echo '<li class="breadcrumb-item">';
 			if (!empty($item->link)) {
 				echo '<a href="' . $item->link . '" class="pathway">' . $item->name . '</a>';
 			} else {
@@ -50,7 +46,7 @@ JHtml::_('bootstrap.tooltip');
 			}
 			echo '</li>';
 		} elseif ($show_last) {
-			echo '<li class="active">' . $item->name . '</li>';
+			echo '<li class="breadcrumb-item active">' . $item->name . '</li>';
 		}
 	}
 	?>

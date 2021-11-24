@@ -1,26 +1,32 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-class JFormFieldSpimage extends JFormField
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\HTML\HTMLHelper;
+
+class JFormFieldSpimage extends FormField
 {
 
   protected $type = 'Spimage';
 
   protected function getInput()
   {
-    $doc = JFactory::getDocument();
+    $doc = Factory::getDocument();
 
-    JHtml::_('jquery.framework');
+    HTMLHelper::_('jquery.framework');
 
-    $plg_path = JURI::root(true) . '/plugins/system/helix3';
+    $plg_path = Uri::root(true) . '/plugins/system/helix3';
     $doc->addScript($plg_path . '/assets/js/spimage.js');
     $doc->addStyleSheet($plg_path . '/assets/css/spimage.css');
 
@@ -37,13 +43,13 @@ class JFormFieldSpimage extends JFormField
 
     if($this->value) {
       $data_src = $this->value;
-      $src = JURI::root(true) . '/' . $data_src;
+      $src = Uri::root(true) . '/' . $data_src;
 
       $basename = basename($data_src);
-      $thumbnail = JPATH_ROOT . '/' . dirname($data_src) . '/' . JFile::stripExt($basename) . '_thumbnail.' . JFile::getExt($basename);
+      $thumbnail = JPATH_ROOT . '/' . dirname($data_src) . '/' . File::stripExt($basename) . '_thumbnail.' . File::getExt($basename);
 
       if(file_exists($thumbnail)) {
-        $src = JURI::root(true) . '/' . dirname($data_src) . '/' . JFile::stripExt($basename) . '_thumbnail.' . JFile::getExt($basename);
+        $src = Uri::root(true) . '/' . dirname($data_src) . '/' . File::stripExt($basename) . '_thumbnail.' . File::getExt($basename);
       }
 
       $output .= '<img src="'. $src .'" data-src="' . $data_src . '" alt="">';
@@ -52,7 +58,7 @@ class JFormFieldSpimage extends JFormField
     $output .= '</div>';
 
     $output .= '<input type="file" class="sp-image-upload" accept="image/*" style="display:none;">';
-    $output .= '<a class="btn btn-info btn-sp-image-upload'. $class1 .'" href="#"><i class="fa fa-plus"></i> Upload Image</a>';
+    $output .= '<a class="btn btn-primary btn-sp-image-upload'. $class1 .'" href="#"><i class="fa fa-plus"></i> Upload Image</a>';
     $output .= '<a class="btn btn-danger btn-sp-image-remove'. $class2 .'" href="#"><i class="fa fa-minus-circle"></i> Remove Image</a>';
 
     $output .= '<input type="hidden" name="'. $this->name .'" id="' . $this->id . '" value="' . htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8')

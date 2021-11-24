@@ -1,20 +1,24 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Version;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Menu\SiteMenu;
 
 $current_menu_id = $this->form->getValue('id');
 
 function create_menu($current_menu_id)
 {
   $items = menuItems();
-  $menus = new JMenuSite;
+  $menus = new SiteMenu;
 
   if (isset($items[$current_menu_id]))
   {
@@ -30,7 +34,7 @@ function create_menu($current_menu_id)
 
 function menuItems()
 {
-  $menus = new JMenuSite;
+  $menus = new SiteMenu;
   $menus = $menus->getMenu();
   $new = array();
   foreach ($menus as $item) {
@@ -41,7 +45,7 @@ function menuItems()
 
 function getModuleNameId($id = 'all')
 {
-  $db = JFactory::getDBO();
+  $db = Factory::getDbo();
 
   if ($id == 'all') {
     $query = 'SELECT id, title FROM `#__modules` WHERE ( `published` !=-2 AND `published` !=0 ) AND client_id = 0';
@@ -85,7 +89,7 @@ if (isset($items[$current_menu_id]) && !empty($items[$current_menu_id])) {
   $item = $items[$current_menu_id];
 }
 
-$menuItems = new JMenuSite;
+$menuItems = new SiteMenu;
 
 $no_child = true;
 $count = 0;
@@ -124,14 +128,13 @@ if ($no_child === true)
 if($count > 4 && $count != 6)
 {
   $count = 4;
-}
+} 
 ?>
 
+<div class="row<?php echo (Version::MAJOR_VERSION < 4) ? '-fluid' : ''; ?>">
 
-<div class="row-fluid">
-
-  <div class="span2">
-    <h3 class="sidebar-title"><?php echo JText::_('HELIX_MENU_DRAG_MODULE'); ?></h3>
+  <div class="<?php echo (Version::MAJOR_VERSION < 4) ? 'span2' : 'col-lg-2'; ?>">
+    <h3 class="sidebar-title"><?php echo Text::_('HELIX_MENU_DRAG_MODULE'); ?></h3>
     <div class="modules-list">
       <?php
       $modules = getModuleNameId();
@@ -143,22 +146,22 @@ if($count > 4 && $count != 6)
     </div>
   </div>
 
-  <div class="span10">
+  <div class="<?php echo (Version::MAJOR_VERSION < 4) ? 'span10' : 'col-lg-10'; ?>">
 
     <div class="action-bar">
       <ul>
         <li>
-          <strong><?php echo JText::_('HELIX_MENU_SUB_WIDTH'); ?></strong> <input type="number" id="menuWidth" name="width" value="<?php echo $menu_width; ?>">
+          <strong><?php echo Text::_('HELIX_MENU_SUB_WIDTH'); ?></strong> <input type="number" id="menuWidth" class="form-control" name="width" value="<?php echo $menu_width; ?>">
         </li>
-        <li id="sizeShape"><a href="#" class="add-layout btn btn-primary"><i class="fa fa-plus"></i> <?php echo JText::_('HELIX_MENU_MANAGE_LAYOUT'); ?></a></li>
-        <li class="btn-group">
-          <a class="alignment btn <?php echo ($align == 'left')?'active':''; ?>" data-al_flag="left" href="#"><?php echo JText::_('HELIX_GLOBAL_LEFT'); ?></a>
-          <a class="alignment btn <?php echo ($align == 'center')?'active':''; ?>" data-al_flag="center" href="#"><?php echo JText::_('HELIX_GLOBAL_CENTER'); ?></a>
-          <a class="alignment btn <?php echo ($align == 'right')?'active':''; ?>" data-al_flag="right" href="#"><?php echo JText::_('HELIX_GLOBAL_RIGHT'); ?></a>
-          <a class="alignment btn <?php echo ($align == 'full')?'active':''; ?>" data-al_flag="full" href="#"><?php echo JText::_('HELIX_GLOBAL_FULL'); ?></a>
+        <li id="sizeShape"><a href="#" class="add-layout btn btn-primary"><i class="fa fa-plus"></i> <?php echo Text::_('HELIX_MENU_MANAGE_LAYOUT'); ?></a></li>
+        <li class="btn-group d-inline-flex">
+          <a class="alignment btn<?php echo (Version::MAJOR_VERSION < 4) ? '' : ' btn-default'; ?> <?php echo ($align == 'left') ? 'active' : ''; ?>" data-al_flag="left" href="#"><?php echo Text::_('HELIX_GLOBAL_LEFT'); ?></a>
+          <a class="alignment btn<?php echo (Version::MAJOR_VERSION < 4) ? '' : ' btn-default'; ?> <?php echo ($align == 'center') ? 'active' : ''; ?>" data-al_flag="center" href="#"><?php echo Text::_('HELIX_GLOBAL_CENTER'); ?></a>
+          <a class="alignment btn<?php echo (Version::MAJOR_VERSION < 4) ? '' : ' btn-default'; ?> <?php echo ($align == 'right') ? 'active' : ''; ?>" data-al_flag="right" href="#"><?php echo Text::_('HELIX_GLOBAL_RIGHT'); ?></a>
+          <a class="alignment btn<?php echo (Version::MAJOR_VERSION < 4) ? '' : ' btn-default'; ?> <?php echo ($align == 'full') ? 'active' : ''; ?>" data-al_flag="full" href="#"><?php echo Text::_('HELIX_GLOBAL_FULL'); ?></a>
         </li>
         <li class="btn-group">
-          <a class="layout-reset btn btn-success"href="#" data-current_item="<?php echo $current_menu_id; ?>"><i class="fa fa-refresh"></i> <?php echo JText::_('HELIX_GLOBAL_RESET'); ?></a>
+          <a class="layout-reset btn btn-success"href="#" data-current_item="<?php echo $current_menu_id; ?>"><i class="fa fa-refresh"></i> <?php echo Text::_('HELIX_GLOBAL_RESET'); ?></a>
         </li>
       </ul>
     </div>
@@ -211,7 +214,7 @@ if($count > 4 && $count != 6)
 
                     ?>
 
-                    <div class="modules-container"><?php if ($modId){
+                    <div class="modules-container" data-content="<?php echo Text::_('HELIX_DROP_MODULE'); ?>"><?php if ($modId){
                       $modArray = explode(',',$modId);
                       foreach ($modArray as $mod_id)
                       {
@@ -252,7 +255,7 @@ if($count > 4 && $count != 6)
           echo '<li>'.$menuItems->getItem($id)->title.'</li>';
         }
         echo '</ul>';
-        echo '<div class="modules-container">';
+        echo '<div class="modules-container" data-content="'.Text::_('HELIX_DROP_MODULE').'">';
         echo '</div>';
         echo '</div>';
         echo '</div>';
@@ -285,7 +288,7 @@ if($count > 4 && $count != 6)
 
           }
 
-          echo '<div class="modules-container"></div>';
+          echo '<div class="modules-container" data-content="'.Text::_('HELIX_DROP_MODULE').'"></div>';
           echo '</div>';
           echo '</div>';
         }
@@ -302,8 +305,12 @@ if($count > 4 && $count != 6)
   <div class="sp-modal-dialog">
     <div class="sp-modal-content">
       <div class="sp-modal-header">
-        <button type="button" class="close" data-dismiss="spmodal" aria-hidden="true">&times;</button>
-        <h3 class="sp-modal-title" id="modal-label"><?php echo JText::_('HELIX_MENU_CHOOSE_LAYOUT'); ?></h3>
+		<?php if(Version::MAJOR_VERSION < 4) : ?>
+        	<button type="button" class="close" data-dismiss="spmodal" aria-hidden="true">&times;</button>
+		<?php else : ?>
+			<button type="button" class="btn-close" data-dismiss="spmodal" aria-hidden="true"></button>
+		<?php endif; ?>
+        <h3 class="sp-modal-title" id="modal-label"><?php echo Text::_('HELIX_MENU_CHOOSE_LAYOUT'); ?></h3>
       </div>
       <div class="sp-modal-body">
         <ul class="menu-layout-list clearfix">

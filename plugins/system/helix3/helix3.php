@@ -1,55 +1,97 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-jimport('joomla.plugin.plugin');
-jimport( 'joomla.event.plugin' );
-jimport('joomla.registry.registry');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\Registry\Registry;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Plugin\PluginHelper;
 
 if(!class_exists('Helix3')) {
-  require_once (__DIR__ . '/core/helix3.php');
+	require_once (__DIR__ . '/core/helix3.php');
 }
 
-class  plgSystemHelix3 extends JPlugin
+class PlgSystemHelix3 extends CMSPlugin
 {
-
-    protected $autoloadLanguage = true;
+	protected $app;
+	
+	protected $db;
+	
+	protected $autoloadLanguage = true;
+	
+	public function __construct(&$subject, $config)
+	{
+		parent::__construct($subject, $config);
+		
+		if (!$this->app)
+		{
+			$this->app = Factory::getApplication();
+		}
+		
+		if (!$this->db)
+		{
+			$this->db = Factory::getDbo();
+		}
+	}
 
     // Copied style
-    function onAfterDispatch() {
+    public function onAfterDispatch()
+    {
+        if( ! $this->app->isClient('administrator') ) {
 
-        if(  !JFactory::getApplication()->isClient('administrator') ) {
+            $activeMenu = $this->app->getMenu()->getActive();
 
-            $activeMenu = JFactory::getApplication()->getMenu()->getActive();
-
-            if(is_null($activeMenu)) $template_style_id = 0;
-            else $template_style_id = (int) $activeMenu->template_style_id;
-            if( $template_style_id > 0 ){
-
-                JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_templates/tables');
-                $style = JTable::getInstance('Style', 'TemplatesTable');
+            if(is_null($activeMenu))
+            {
+				$template_style_id = 0;
+			}
+            else {
+				$template_style_id = (int) $activeMenu->template_style_id;
+			}
+            
+            if( $template_style_id > 0 )
+            {
+                Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_templates/tables');
+                $style = Table::getInstance('Style', 'TemplatesTable');
                 $style->load($template_style_id);
 
-                if( !empty($style->template) ) JFactory::getApplication()->setTemplate($style->template, $style->params);
+                if( !empty($style->template) ) {
+					$this->app->setTemplate($style->template, $style->params);
+				}
             }
         }
     }
 
-    function onContentPrepareForm($form, $data) {
+    public function onContentPrepareForm($form, $data)
+    {
+		if (!$form instanceof Form)
+		{
+			$this->subject->setError('JERROR_NOT_A_FORM');
 
-        $doc = JFactory::getDocument();
-        $plg_path = JURI::root(true) . '/plugins/system/helix3';
-        JForm::addFormPath(JPATH_PLUGINS.'/system/helix3/params');
+			return false;
+		}
+		
+        $doc 		= Factory::getDocument();
+        $plg_path 	= Uri::root(true) . '/plugins/system/helix3';
+        Form::addFormPath(JPATH_PLUGINS . '/system/helix3/params');
 
-        if ($form->getName()=='com_menus.item') { //Add Helix menu params to the menu item
-            JHtml::_('jquery.framework');
+        //Add Helix menu params to the menu item
+        if ($form->getName() == 'com_menus.item')
+        { 
+            HTMLHelper::_('jquery.framework');
+            
             $data = (array)$data;
 
             if($data['id'] && $data['parent_id'] == 1)
@@ -59,49 +101,45 @@ class  plgSystemHelix3 extends JPlugin
                 $doc->addStyleSheet($plg_path . '/assets/css/modal.css');
                 $doc->addStyleSheet($plg_path . '/assets/css/menu.generator.css');
                 
-                JHtml::_('jquery.framework');
+                HTMLHelper::_('jquery.framework');
                 $doc->addScript($plg_path . '/assets/js/jquery-ui.min.js');
-                // $doc->addScript($plg_path . '/assets/js/jquery.ui.core.min.js');
-                // $doc->addScript($plg_path . '/assets/js/jquery.ui.sortable.min.js');
-                // $doc->addScript($plg_path . '/assets/js/jquery-ui.draggable.min.js');
                 $doc->addScript($plg_path . '/assets/js/modal.js');
-                $doc->addScript( $plg_path . '/assets/js/menu.generator.js' );
+                $doc->addScript($plg_path . '/assets/js/menu.generator.js');
                 $form->loadFile('menu-parent', false);
-
-            } else {
+            }
+            else
+            {
                 $form->loadFile('menu-child', false);
             }
 
             $form->loadFile('page-title', false);
-
         }
 
         //Article Post format
-        if ($form->getName()=='com_content.article') {
-            JHtml::_('jquery.framework');
+        if ($form->getName() == 'com_content.article')
+        {
+            HTMLHelper::_('jquery.framework');
             $doc->addStyleSheet($plg_path.'/assets/css/font-awesome.min.css');
             $doc->addScript($plg_path.'/assets/js/post-formats.js');
 
             $tpl_path = JPATH_ROOT . '/templates/' . $this->getTemplateName();
 
-            if(JFile::exists( $tpl_path . '/post-formats.xml' )) {
-                JForm::addFormPath($tpl_path);
+            if(File::exists( $tpl_path . '/post-formats.xml' )) {
+                Form::addFormPath($tpl_path);
             } else {
-                JForm::addFormPath(JPATH_PLUGINS . '/system/helix3/params');
+                Form::addFormPath(JPATH_PLUGINS . '/system/helix3/params');
             }
 
             $form->loadFile('post-formats', false);
         }
-
     }
 
-
     // Live Update system
-    public function onExtensionAfterSave($option, $data) {
-
-        if ($option == 'com_templates.style' && !empty($data->id)) {
-
-            $params = new JRegistry;
+    public function onExtensionAfterSave($option, $data)
+    {
+        if ($option == 'com_templates.style' && !empty($data->id))
+        {
+            $params = new Registry;
             $params->loadString($data->params);
 
             $email       = $params->get('joomshaper_email');
@@ -110,58 +148,50 @@ class  plgSystemHelix3 extends JPlugin
 
             if(!empty($email) and !empty($license_key) )
             {
-
                 $extra_query = 'joomshaper_email=' . urlencode($email);
                 $extra_query .='&amp;joomshaper_license_key=' . urlencode($license_key);
 
-                $db = JFactory::getDbo();
-
                 $fields = array(
-                    $db->quoteName('extra_query') . '=' . $db->quote($extra_query),
-                    $db->quoteName('last_check_timestamp') . '=0'
+                    $this->db->quoteName('extra_query') . '=' . $this->db->quote($extra_query),
+                    $this->db->quoteName('last_check_timestamp') . '=0'
                 );
 
-                $query = $db->getQuery(true)
-                    ->update($db->quoteName('#__update_sites'))
+                $query = $this->db->getQuery(true)
+                    ->update($this->db->quoteName('#__update_sites'))
                     ->set($fields)
-                    ->where($db->quoteName('name').'='.$db->quote($template));
-                $db->setQuery($query);
-                $db->execute();
+                    ->where($this->db->quoteName('name').'='.$this->db->quote($template));
+                $this->db->setQuery($query);
+                $this->db->execute();
             }
         }
     }
 
     public function onAfterRoute()
     {
-        $japps = JFactory::getApplication();
-
-        if ( $japps->isClient('administrator') )
+        if ( $this->app->isClient('administrator') )
         {
-            $user = JFactory::getUser();
+            $user = Factory::getUser();
 
             if( !in_array( 8, $user->groups ) ){
                 return false;
             }
 
-            $inputs = JFactory::getApplication()->input;
-
-            $option         = $inputs->get ( 'option', '' );
-            $id             = $inputs->get ( 'id', '0', 'INT' );
-            $helix3task     = $inputs->get ( 'helix3task' ,'' );
+            $option         = $this->app->input->get ( 'option', '' );
+            $id             = $this->app->input->get ( 'id', '0', 'INT' );
+            $helix3task     = $this->app->input->get ( 'helix3task' ,'' );
 
             if ( strtolower( $option ) == 'com_templates' && $id && $helix3task == "export" )
             {
-               $db = JFactory::getDbo();
-               $query = $db->getQuery(true);
+               $query = $this->db->getQuery(true);
 
                $query
                     ->select( '*' )
-                    ->from( $db->quoteName( '#__template_styles' ) )
-                    ->where( $db->quoteName( 'id' ) . ' = ' . $db->quote( $id ) . ' AND ' . $db->quoteName( 'client_id' ) . ' = 0' );
+                    ->from( $this->db->quoteName( '#__template_styles' ) )
+                    ->where( $this->db->quoteName( 'id' ) . ' = ' . $this->db->quote( $id ) . ' AND ' . $this->db->quoteName( 'client_id' ) . ' = 0' );
 
                 $db->setQuery( $query );
 
-                $result = $db->loadObject();
+                $result = $this->db->loadObject();
 
                 header( 'Content-Description: File Transfer' );
                 header( 'Content-type: application/txt' );
@@ -176,12 +206,11 @@ class  plgSystemHelix3 extends JPlugin
                 exit;
             }
         }
-
     }
 
     private function getTemplateName()
     {
-        $db = JFactory::getDbo();
+        $db = Factory::getDbo();
         $query = $db->getQuery(true);
         $query->select($db->quoteName(array('template')));
         $query->from($db->quoteName('#__template_styles'));
@@ -192,19 +221,17 @@ class  plgSystemHelix3 extends JPlugin
         return $db->loadObject()->template;
     }
 
-    function onAfterRender__() {
-        $app = JFactory::getApplication();
-
-  		if ($app->isClient('administrator'))
+    public function onAfterRender__()
+    {
+        if ($this->app->isClient('administrator'))
         {
   			return;
   		}
           
-        $body = JFactory::getApplication()->getBody();
+        $body 	= $this->app->getBody();
   		$preset = Helix3::Preset();
+  		$body 	= str_replace('{helix_preset}', $preset, $body);
 
-  		$body = str_replace('{helix_preset}', $preset, $body);
-
-  		JFactory::getApplication()->setBody($body);
+  		$this->app->setBody($body);
     }
 }

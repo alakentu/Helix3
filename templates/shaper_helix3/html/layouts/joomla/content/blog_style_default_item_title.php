@@ -1,11 +1,10 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  Layout
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 defined('_JEXEC') or die;
 
@@ -16,7 +15,7 @@ JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 
 $currentDate   = JFactory::getDate()->format('Y-m-d H:i:s');
 $isNotPublishedYet = $displayData->publish_up > $currentDate;
-$isExpired         = JVERSION < 4 ? $displayData->publish_down < $currentDate && $displayData->publish_down !== Factory::getDbo()->getNullDate() : !is_null($displayData->publish_down) && $displayData->publish_down < $currentDate;
+$isExpired         = JVERSION < 4 ? $displayData->publish_down < $currentDate && $displayData->publish_down !== JFactory::getDbo()->getNullDate() : !is_null($displayData->publish_down) && $displayData->publish_down < $currentDate;
 ?>
 
 <?php if ($params->get('show_title') || $displayData->state == 0 || ($params->get('show_author') && !empty($displayData->author ))) : ?>

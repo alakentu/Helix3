@@ -1,11 +1,14 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-defined('_JEXEC') or die('Restricted Access');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Filter\OutputFilter;
 
 //helper & model
 $menu_class   = JPATH_ROOT . '/plugins/system/helix3/core/classes/helix3.php';
@@ -18,7 +21,7 @@ $data = $displayData;
 
 $output ='';
 
-    $output .= '<div id="sp-' . JFilterOutput::stringURLSafe($data->settings->name) . '" class="' . $data->className . '">';
+    $output .= '<div id="sp-' . OutputFilter::stringURLSafe($data->settings->name) . '" class="' . $data->className . '">';
 
         $output .= '<div class="sp-column ' . ($data->settings->custom_class) . '">';
 

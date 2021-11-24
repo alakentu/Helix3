@@ -55,7 +55,7 @@ if ($this->print)
 // status
 $currentDate   = JFactory::getDate()->format('Y-m-d H:i:s');
 $isExpired  = JVERSION < 4
-	? (strtotime($this->item->publish_down) < strtotime(Factory::getDate())) && $this->item->publish_down != JFactory::getDbo()->getNullDate()
+	? (strtotime($this->item->publish_down) < strtotime(JFactory::getDate())) && $this->item->publish_down != JFactory::getDbo()->getNullDate()
 	: !is_null($this->item->publish_down) && $this->item->publish_down < $currentDate;
 
 ?>
@@ -81,13 +81,13 @@ $isExpired  = JVERSION < 4
 	?>
 
 	<div class="entry-header<?php echo $has_post_format ? ' has-post-format': ''; ?>">
-		<?php echo JLayoutHelper::render('joomla.content.post_formats.icons',  $post_format); ?>
-
+		
 		<?php if (!$this->print && $useDefList && ($info == 0 || $info == 2)) : ?>
 			<?php echo JLayoutHelper::render('joomla.content.info_block.block', array('item' => $this->item, 'params' => $params, 'position' => 'above')); ?>
 		<?php endif; ?>
 
 		<?php if ($params->get('show_title') || $params->get('show_author')) : ?>
+			<?php echo JLayoutHelper::render('joomla.content.post_formats.icons',  $post_format); ?>
 			<h2 itemprop="name">
 				<?php if ($params->get('show_title')) : ?>
 					<?php echo $this->escape($this->item->title); ?>

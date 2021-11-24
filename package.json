@@ -1,0 +1,36 @@
+{
+  "name": "helix3-joomla",
+  "version": "3.0.1",
+  "description": "Helix3 is a user-friendly, modern, highly customizable and easy to integrate solution to build your custom Joomla 3+ website.",
+  "main": "gulpfile.js",
+  "scripts": {
+	"test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoomShaper/Helix3.git"
+  },
+  "keywords": [
+    "Joomla",
+    "Php",
+    "Template"
+  ],
+  "author": "JoomShaper <support@joomshaper.com>",
+  "license": "GPL-2.0-only",
+  "bugs": {
+    "url": "https://github.com/JoomShaper/Helix3/issues"
+  },
+  "homepage": "https://github.com/JoomShaper/Helix3#README.md",
+  "devDependencies": {
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulplog": "^1.0.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-uglify-es": "^3.0.0",
+    "gulp-zip": "^5.1.0",
+    "mysqldump": "^3.2.0",
+    "shelljs": "^0.8.4"
+  }
+}

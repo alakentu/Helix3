@@ -1,18 +1,17 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  Layout
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 $params = $displayData['params'];
 $item = $displayData['item'];
 ?>
 
 <p class="readmore">
-	<a class="btn btn-default" href="<?php echo $displayData['link']; ?>" itemprop="url">
+	<a class="btn btn-secondary" href="<?php echo $displayData['link']; ?>" itemprop="url">
 		<?php if (!$params->get('access-view')) :
 			echo JText::_('COM_CONTENT_REGISTER_TO_READ_MORE');
 		elseif ($readmore = $item->alternative_readmore) :

@@ -1,28 +1,32 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-class JFormFieldSpgallery extends JFormField {
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\File;
 
+class JFormFieldSpgallery extends FormField
+{
   protected $type = 'Spgallery';
 
   protected function getInput()
   {
-    $doc = JFactory::getDocument();
+    $doc = Factory::getDocument();
 
-    JHtml::_('jquery.framework');
+    HTMLHelper::_('jquery.framework');
+
+    $plg_path = Uri::root(true) . '/plugins/system/helix3';
     $doc->addScript($plg_path . '/assets/js/jquery-ui.min.js');
-    // $doc->addScript($plg_path . '/assets/js/jquery.ui.core.min.js');
-    // $doc->addScript($plg_path . '/assets/js/jquery.ui.sortable.min.js');
-
-    $plg_path = JURI::root(true) . '/plugins/system/helix3';
     $doc->addScript($plg_path . '/assets/js/spgallery.js');
     $doc->addStyleSheet($plg_path . '/assets/css/spgallery.css');
 
@@ -43,18 +47,20 @@ class JFormFieldSpgallery extends JFormField {
 
         $data_src = $value;
 
-        $src = JURI::root(true) . '/' . $value;
+        $src = Uri::root(true) . '/' . $value;
 
         $basename = basename($src);
 
-        $thumbnail = JPATH_ROOT . '/' . dirname($value) . '/' . JFile::stripExt($basename) . '_thumbnail.' . JFile::getExt($basename);
+        $thumbnail = JPATH_ROOT . '/' . dirname($value) . '/' . File::stripExt($basename) . '_thumbnail.' . File::getExt($basename);
+        
         if(file_exists($thumbnail)) {
-          $src = JURI::root(true) . '/' . dirname($value) . '/' . JFile::stripExt($basename) . '_thumbnail.' . JFile::getExt($basename);
+          $src = Uri::root(true) . '/' . dirname($value) . '/' . File::stripExt($basename) . '_thumbnail.' . File::getExt($basename);
         }
 
-        $small_size = JPATH_ROOT . '/' . dirname($value) . '/' . JFile::stripExt($basename) . '_small.' . JFile::getExt($basename);
+        $small_size = JPATH_ROOT . '/' . dirname($value) . '/' . File::stripExt($basename) . '_small.' . File::getExt($basename);
+        
         if(file_exists($small_size)) {
-          $src = JURI::root(true) . '/' . dirname($value) . '/' . JFile::stripExt($basename) . '_small.' . JFile::getExt($basename);
+          $src = Uri::root(true) . '/' . dirname($value) . '/' . File::stripExt($basename) . '_small.' . File::getExt($basename);
         }
 
         $output .= '<li data-src="' . $data_src . '"><a href="#" class="btn btn-mini btn-danger btn-remove-image">Delete</a><img src="'. $src .'" alt=""></li>';
@@ -64,7 +70,7 @@ class JFormFieldSpgallery extends JFormField {
     $output .= '</ul>';
 
     $output .= '<input type="file" class="sp-gallery-item-upload" accept="image/*" style="display:none;">';
-    $output .= '<a class="btn btn-default btn-large btn-sp-gallery-item-upload" href="#"><i class="fa fa-plus"></i> Upload Images</a>';
+    $output .= '<a class="btn btn-default btn-outline-primary btn-sp-gallery-item-upload" href="#"><i class="fa fa-plus"></i> Upload Images</a>';
 
 
     $output .= '<input type="hidden" name="'. $this->name .'" data-name="'. $this->element['name'] .'_images" id="' . $this->id . '" value="' . htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8')

@@ -1,11 +1,10 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  mod_menu
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 defined('_JEXEC') or die;
 
@@ -30,13 +29,13 @@ foreach ($list as $i => &$item)
 {
 
 	// get item params and decode it
-	$item_decode = json_decode($item->params);
+	$item_decode = json_decode($item->getParams());
 
 	$custom_class = (isset($item_decode->class) && $item_decode->class) ? $item_decode->class : '';
 
 	$class = 'item-' . $item->id . ' '. $custom_class;
 
-	if (($item->id == $active_id) OR ($item->type == 'alias' AND $item->params->get('aliasoptions') == $active_id)){
+	if (($item->id == $active_id) OR ($item->type == 'alias' AND $item->getParams()->get('aliasoptions') == $active_id)){
 		$class .= ' current';
 	}
 
@@ -46,7 +45,7 @@ foreach ($list as $i => &$item)
 	}
 	elseif ($item->type == 'alias')
 	{
-		$aliasToId = $item->params->get('aliasoptions');
+		$aliasToId = $item->getParams()->get('aliasoptions');
 
 		if (count($path) > 0 && $aliasToId == $path[count($path) - 1])
 		{

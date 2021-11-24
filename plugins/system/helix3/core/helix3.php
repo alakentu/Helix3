@@ -1,17 +1,21 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
-jimport('joomla.filter.filteroutput');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\File;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Version;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Layout\FileLayout;
+use Joomla\CMS\Filter\OutputFilter;
 
 class Helix3
 {
@@ -50,7 +54,7 @@ class Helix3
 	*/
 	public static function getDocument($key = false)
 	{
-		self::getInstance()->document = JFactory::getDocument();
+		self::getInstance()->document = Factory::getDocument();
 		$doc                          = self::getInstance()->document;
 		if (is_string($key))
 		{
@@ -62,16 +66,64 @@ class Helix3
 
 	public static function getParam($key)
 	{
-		$params = JFactory::getApplication()->getTemplate(true)->params;
+		$params = Factory::getApplication()->getTemplate(true)->params;
 
 		return $params->get($key);
+	}
+
+	public static function loadHead()
+	{
+		$doc         = Factory::getDocument();
+		$app         = Factory::getApplication();
+		$option      = $app->input->get('option', '');
+		$view        = $app->input->get('view', '');
+		$layout        = $app->input->get('layout', '');
+
+		// Favicon
+		if ($favicon = self::getParam('favicon'))
+		{
+			$doc->addFavicon(Uri::base(true) . '/' . $favicon);
+		}
+		else
+		{
+			$doc->addFavicon(self::getTemplateUri() . '/images/favicon.ico');
+		}
+
+		// load legacy css
+		if ($view == 'form' && $layout == 'edit')
+		{
+			if (version_compare(Version::getShortVersion(), '4.0.0', '>='))
+			{
+				$doc->addStylesheet(Uri::base(true) . '/plugins/system/helix3/assets/css/system.j4.min.css');
+			}
+			else
+			{
+				$doc->addStylesheet(Uri::base(true) . '/plugins/system/helix3/assets/css/system.j3.min.css');
+			}
+		}
+
+		// web fonts
+		self::loadWebFonts();
+
+		HTMLHelper::_('jquery.framework');
+
+		// Remove Joomla core bootstrap
+		if (version_compare(Version::getShortVersion(), '4.0.0', '>='))
+		{
+			HTMLHelper::_('bootstrap.framework');
+			if(isset($doc->_scripts[Uri::base(true) . '/media/jui/js/bootstrap.min.js'])) {
+				unset($doc->_scripts[Uri::base(true) . '/media/jui/js/bootstrap.min.js']);
+			}
+		}
+
+		echo '<jdoc:include type="head" />';
 	}
 
 	//Body Class
 	public static function bodyClass($class = '')
 	{
-		$app       = JFactory::getApplication();
-		$doc       = JFactory::getDocument();
+		$app       = Factory::getApplication();
+		$doc       = Factory::getDocument();
 		$language  = $doc->language;
 		$direction = $doc->direction;
 		$option    = str_replace('_', '-', $app->input->getCmd('option', ''));
@@ -103,7 +155,7 @@ class Helix3
 	//Get view
 	public static function view($class = '')
 	{
-		$app    = JFactory::getApplication();
+		$app    = Factory::getApplication();
 		$view   = $app->input->getCmd('view', '');
 		$layout = $app->input->getCmd('layout', '');
 
@@ -118,13 +170,13 @@ class Helix3
 	//Get Template name
 	public static function getTemplate()
 	{
-		return JFactory::getApplication()->getTemplate();
+		return Factory::getApplication()->getTemplate();
 	}
 
 	//Get Template URI
 	public static function getTemplateUri()
 	{
-		return JURI::base(true) . '/templates/' . self::getTemplate();
+		return Uri::base(true) . '/templates/' . self::getTemplate();
 	}
 
 	/**
@@ -140,20 +192,20 @@ class Helix3
 		// if $name = true, this will return all param data
 		if (is_bool($name) and $name == true)
 		{
-			return JFactory::getApplication()->getTemplate(true)->params;
+			return Factory::getApplication()->getTemplate(true)->params;
 		}
 		// if $value = null, this will return specific param data
 		if (is_null($value))
 		{
-			return JFactory::getApplication()->getTemplate(true)->params->get($name);
+			return Factory::getApplication()->getTemplate(true)->params->get($name);
 		}
 		// if $value not = null, this will set a value in specific name.
 
-		$data = JFactory::getApplication()->getTemplate(true)->params->get($name);
+		$data = Factory::getApplication()->getTemplate(true)->params->get($name);
 
 		if (is_null($data) or !isset($data))
 		{
-			JFactory::getApplication()->getTemplate(true)->params->set($name, $value);
+			Factory::getApplication()->getTemplate(true)->params->set($name, $value);
 
 			return $value;
 		}
@@ -174,12 +226,12 @@ class Helix3
 	private static function importFeatures()
 	{
 
-		$template = JFactory::getApplication()->getTemplate();
+		$template = Factory::getApplication()->getTemplate();
 		$path     = JPATH_THEMES . '/' . $template . '/features';
 
 		if (file_exists($path))
 		{
-			$files = JFolder::files($path, '.php');
+			$files = Folder::files($path, '.php');
 
 			if (count($files))
 			{
@@ -187,7 +239,7 @@ class Helix3
 				{
 
 					include_once $path . '/' . $file;
-					$name = JFile::stripExt($file);
+					$name = File::stripExt($file);
 
 					$class = 'Helix3Feature' . ucfirst($name);
 					$class = new $class(self::getInstance());
@@ -219,7 +271,7 @@ class Helix3
 		//Remove Classes name
 		$class_remove = array('layout-column', 'column-active', 'col-sm-');
 
-		return trim(str_replace($class_remove, '', $col_name));
+		return (int) trim(str_replace($class_remove, '', $col_name));
 	}
 
 	public static function generatelayout()
@@ -228,29 +280,30 @@ class Helix3
 		self::getInstance()->addCSS('custom.css');
 		self::getInstance()->addJS('custom.js');
 
-		$doc         = JFactory::getDocument();
-		$app         = JFactory::getApplication();
+		$doc         = Factory::getDocument();
+		$app         = Factory::getApplication();
 		$option      = $app->input->get('option', '');
 		$view        = $app->input->get('view', '');
+		$layout        = $app->input->get('layout', '');
 		$pagebuilder = false;
 
 		if ($option == 'com_sppagebuilder')
 		{
-			$doc->addStylesheet( JURI::base(true) . '/plugins/system/helix3/assets/css/pagebuilder.css' );
+			$doc->addStylesheet(Uri::base(true) . '/plugins/system/helix3/assets/css/pagebuilder.css');
 			$pagebuilder = true;
 		}
 
 		//Import Features
 		self::importFeatures();
 
-		$params = JFactory::getApplication()->getTemplate(true)->params;
+		$params = Factory::getApplication()->getTemplate(true)->params;
 		$rows   = json_decode($params->get('layout'));
 
 		//Load from file if not exists in database
 		if (empty($rows))
 		{
 			$layout_file = JPATH_SITE . '/templates/' . self::getTemplate() . '/layout/default.json';
-			if (!JFile::exists($layout_file))
+			if (!File::exists($layout_file))
 			{
 				die('Default Layout file is not exists! Please goto to template manager and create a new layout first.');
 			}
@@ -281,7 +334,7 @@ class Helix3
 					$fluidrow = $row->settings->fluidrow;
 				}
 
-				$id = (empty($row->settings->name)) ? 'sp-section-' . ($key + 1) : 'sp-' . JFilterOutput::stringURLSafe($row->settings->name);
+				$id = (empty($row->settings->name)) ? 'sp-section-' . ($key + 1) : 'sp-' . OutputFilter::stringURLSafe($row->settings->name);
 
 				$row_class = '';
 
@@ -319,7 +372,7 @@ class Helix3
 
 				if (!empty($row->settings->background_image)) {
 
-					$row_css .= 'background-image:url("' . JURI::base(true) . '/' . $row->settings->background_image . '");';
+					$row_css .= 'background-image:url("' . Uri::base(true) . '/' . $row->settings->background_image . '");';
 
 					if (!empty($row->settings->background_repeat)) {
 						$row_css .= 'background-repeat:' . $row->settings->background_repeat . ';';
@@ -398,14 +451,14 @@ class Helix3
 					'componentArea' 	=> $componentArea,
 				);
 
-				$template  		= JFactory::getApplication()->getTemplate();
+				$template  		= Factory::getApplication()->getTemplate();
 				$themepath 		= JPATH_THEMES . '/' . $template;
 				$generate_file	= $themepath . '/html/layouts/helix3/frontend/generate.php';
 				$lyt_thm_path   = $themepath . '/html/layouts/helix3/';
 
 				$layout_path  = (file_exists($generate_file)) ? $lyt_thm_path : JPATH_ROOT .'/plugins/system/helix3/layouts';
 
-				$getLayout = new JLayoutFile('frontend.generate', $layout_path );
+				$getLayout = new FileLayout('frontend.generate', $layout_path );
 				$output .= $getLayout->render($layout_data);
 
 			}
@@ -436,7 +489,7 @@ class Helix3
 	//Get Active Columns
 	private static function rowColumns($columns)
 	{
-		$doc  = JFactory::getDocument();
+		$doc  = Factory::getDocument();
 		$cols = array();
 
 		//Inactive
@@ -505,7 +558,7 @@ class Helix3
 	//Count Modules
 	public static function countModules($position)
 	{
-		$doc = JFactory::getDocument();
+		$doc = Factory::getDocument();
 
 		return ($doc->countModules($position) or self::hasFeature($position));
 	}
@@ -539,7 +592,7 @@ class Helix3
 	public static function addCSS($sources, $attribs = array())
 	{
 
-		$template = JFactory::getApplication()->getTemplate();
+		$template = Factory::getApplication()->getTemplate();
 		$path     = JPATH_THEMES . '/' . $template . '/css/';
 
 		$srcs = array();
@@ -561,7 +614,7 @@ class Helix3
 
 			if (file_exists($path . $src))
 			{
-				self::getInstance()->document->addStyleSheet(JURI::base(true) . '/templates/' . $template . '/css/' . $src, 'text/css', null, $attribs);
+				self::getInstance()->document->addStyleSheet(Uri::base(true) . '/templates/' . $template . '/css/' . $src, 'text/css', null, $attribs);
 			}
 			else
 			{
@@ -588,7 +641,7 @@ class Helix3
 
 		$srcs = array();
 
-		$template = JFactory::getApplication()->getTemplate();
+		$template = Factory::getApplication()->getTemplate();
 		$path     = JPATH_THEMES . '/' . $template . '/js/';
 
 		if (is_string($sources))
@@ -608,7 +661,7 @@ class Helix3
 
 			if (file_exists($path . $src))
 			{
-				self::getInstance()->document->addScript(JURI::base(true) . '/templates/' . $template . '/js/' . $src);
+				self::getInstance()->document->addScript(Uri::base(true) . '/templates/' . $template . '/js/' . $src);
 			}
 			else
 			{
@@ -712,7 +765,7 @@ class Helix3
 	private static function autoCompileLess($less, $css)
 	{
 		// load the cache
-		$template  = JFactory::getApplication()->getTemplate();
+		$template  = Factory::getApplication()->getTemplate();
 		$cachePath = JPATH_CACHE . '/com_templates/templates/' . $template;
 		$cacheFile = $cachePath . '/' . basename($css . ".cache");
 
@@ -742,7 +795,7 @@ class Helix3
 
 			if (!file_exists($cachePath))
 			{
-				JFolder::create($cachePath, 0755);
+				Folder::create($cachePath, 0755);
 			}
 
 			file_put_contents($cacheFile, serialize($newCache));
@@ -762,7 +815,7 @@ class Helix3
 	*/
 	public static function addLess($less, $css, $attribs = array())
 	{
-		$template  = JFactory::getApplication()->getTemplate();
+		$template  = Factory::getApplication()->getTemplate();
 		$themepath = JPATH_THEMES . '/' . $template;
 
 		if (self::getParam('lessoption') and self::getParam('lessoption') == '1')
@@ -792,7 +845,7 @@ class Helix3
 
 	private static function resetCookie($name)
 	{
-		if (JRequest::getVar('reset', '', 'get') == 1)
+		if (Factory::getApplication()->input->get->get('reset', '') == 1)
 		{
 			setcookie($name, '', time() - 3600, '/');
 		}
@@ -804,7 +857,7 @@ class Helix3
 	*/
 	public static function Preset()
 	{
-		$template = JFactory::getApplication()->getTemplate();
+		$template = Factory::getApplication()->getTemplate();
 		$name     = $template . '_preset';
 
 		if (isset($_COOKIE[$name]))
@@ -869,6 +922,70 @@ class Helix3
 	}
 
 	/**
+	 * Load Web Fonts
+	 */
+	public static function loadWebFonts()
+	{
+		//Body Font
+		$webfonts = array();
+
+		if (self::getParam('enable_body_font'))
+		{
+			$webfonts['body'] = self::getParam('body_font');
+		}
+
+		//Heading1 Font
+		if (self::getParam('enable_h1_font'))
+		{
+			$webfonts['h1'] = self::getParam('h1_font');
+		}
+
+		//Heading2 Font
+		if (self::getParam('enable_h2_font'))
+		{
+			$webfonts['h2'] = self::getParam('h2_font');
+		}
+
+		//Heading3 Font
+		if (self::getParam('enable_h3_font'))
+		{
+			$webfonts['h3'] = self::getParam('h3_font');
+		}
+
+		//Heading4 Font
+		if (self::getParam('enable_h4_font'))
+		{
+			$webfonts['h4'] = self::getParam('h4_font');
+		}
+
+		//Heading5 Font
+		if (self::getParam('enable_h5_font'))
+		{
+			$webfonts['h5'] = self::getParam('h5_font');
+		}
+
+		//Heading6 Font
+		if (self::getParam('enable_h6_font'))
+		{
+			$webfonts['h6'] = self::getParam('h6_font');
+		}
+
+		//Navigation Font
+		if (self::getParam('enable_navigation_font'))
+		{
+			$webfonts['.sp-megamenu-parent'] = self::getParam('navigation_font');
+		}
+
+		//Custom Font
+		if (self::getParam('enable_custom_font') && self::getParam('custom_font_selectors'))
+		{
+			$webfonts[self::getParam('custom_font_selectors')] = self::getParam('custom_font');
+		}
+
+		self::addGoogleFont($webfonts);
+	}
+
+	/**
 	* Add Google Fonts
 	*
 	* @param string $name  . Name of font. Ex: Yanone+Kaffeesatz:400,700,300,200 or Yanone+Kaffeesatz  or Yanone
@@ -877,9 +994,9 @@ class Helix3
 	*/
 	public static function addGoogleFont($fonts)
 	{
-		$doc = JFactory::getDocument();
+		$doc = Factory::getDocument();
 		$webfonts = '';
-		$tpl_path = JPATH_BASE . '/templates/' . JFactory::getApplication()->getTemplate() . '/webfonts/webfonts.json';
+		$tpl_path = JPATH_BASE . '/templates/' . Factory::getApplication()->getTemplate() . '/webfonts/webfonts.json';
 		$plg_path = JPATH_BASE . '/plugins/system/helix3/assets/webfonts/webfonts.json';
 
 		if (file_exists($tpl_path))
@@ -998,7 +1115,7 @@ class Helix3
 			$excludes = explode(',', $excludes);
 			foreach ($excludes as $exclude)
 			{
-				if (JFile::getName($key) == trim($exclude))
+				if (File::getName($key) == trim($exclude))
 				{
 					$match = true;
 				}
@@ -1013,14 +1130,14 @@ class Helix3
 
 		require_once(__DIR__ . '/classes/Minifier.php');
 
-		$doc       = JFactory::getDocument();
-		$app       = JFactory::getApplication();
+		$doc       = Factory::getDocument();
+		$app       = Factory::getApplication();
 		$cachetime = $app->get('cachetime', 15);
 
 		$all_scripts  = $doc->_scripts;
 		$cache_path   = JPATH_CACHE . '/com_templates/templates/' . self::getTemplate();
 		$scripts      = array();
-		$root_url     = JURI::root(true);
+		$root_url     = Uri::root(true);
 		$minifiedCode = '';
 		$md5sum       = '';
 
@@ -1033,14 +1150,14 @@ class Helix3
 				$js_file = JPATH_ROOT . $key;
 			}
 
-			if (JFile::exists($js_file))
+			if (File::exists($js_file))
 			{
 				if (!self::excludeJS($key, $excludes))
 				{
 					$scripts[] = $key;
 					$md5sum .= md5($key);
 					$compressed = \JShrink\Minifier::minify(file_get_contents($js_file), array('flaggedComments' => false));
-					$minifiedCode .= "/*------ " . JFile::getName($js_file) . " ------*/\n" . $compressed . "\n\n";//add file name to compressed JS
+					$minifiedCode .= "/*------ " . File::getName($js_file) . " ------*/\n" . $compressed . "\n\n";//add file name to compressed JS
 
 					unset($doc->_scripts[$key]); //Remove sripts
 				}
@@ -1050,28 +1167,28 @@ class Helix3
 		//Compress All scripts
 		if ($minifiedCode)
 		{
-			if (!JFolder::exists($cache_path))
+			if (!Folder::exists($cache_path))
 			{
-				JFolder::create($cache_path, 0755);
+				Folder::create($cache_path, 0755);
 			}
 			else
 			{
 
 				$file = $cache_path . '/' . md5($md5sum) . '.js';
 
-				if (!JFile::exists($file))
+				if (!File::exists($file))
 				{
-					JFile::write($file, $minifiedCode);
+					File::write($file, $minifiedCode);
 				}
 				else
 				{
 					if (filesize($file) == 0 || ((filemtime($file) + $cachetime * 60) < time()))
 					{
-						JFile::write($file, $minifiedCode);
+						File::write($file, $minifiedCode);
 					}
 				}
 
-				$doc->addScript(JURI::base(true) . '/cache/com_templates/templates/' . self::getTemplate() . '/' . md5($md5sum) . '.js');
+				$doc->addScript(Uri::base(true) . '/cache/com_templates/templates/' . self::getTemplate() . '/' . md5($md5sum) . '.js');
 			}
 		}
 
@@ -1084,13 +1201,13 @@ class Helix3
 
 		require_once(__DIR__ . '/classes/cssmin.php');
 
-		$doc             = JFactory::getDocument();
-		$app             = JFactory::getApplication();
+		$doc             = Factory::getDocument();
+		$app             = Factory::getApplication();
 		$cachetime       = $app->get('cachetime', 15);
 		$all_stylesheets = $doc->_styleSheets;
 		$cache_path      = JPATH_CACHE . '/com_templates/templates/' . self::getTemplate();
 		$stylesheets     = array();
-		$root_url        = JURI::root(true);
+		$root_url        = Uri::root(true);
 		$minifiedCode    = '';
 		$md5sum          = '';
 
@@ -1106,7 +1223,7 @@ class Helix3
 			global $absolute_url;
 			$absolute_url = $key;//absoulte path of each css file
 
-			if (JFile::exists($css_file))
+			if (File::exists($css_file))
 			{
 				$stylesheets[] = $key;
 				$md5sum .= md5($key);
@@ -1129,7 +1246,7 @@ class Helix3
 					return "url('$url')";
 				}, $compressed);
 
-				$minifiedCode .= "/*------ " . JFile::getName($css_file) . " ------*/\n" . $fixUrl . "\n\n";//add file name to compressed css
+				$minifiedCode .= "/*------ " . File::getName($css_file) . " ------*/\n" . $fixUrl . "\n\n";//add file name to compressed css
 
 				unset($doc->_styleSheets[$key]); //Remove sripts
 			}
@@ -1138,28 +1255,28 @@ class Helix3
 		//Compress All stylesheets
 		if ($minifiedCode)
 		{
-			if (!JFolder::exists($cache_path))
+			if (!Folder::exists($cache_path))
 			{
-				JFolder::create($cache_path, 0755);
+				Folder::create($cache_path, 0755);
 			}
 			else
 			{
 
 				$file = $cache_path . '/' . md5($md5sum) . '.css';
 
-				if (!JFile::exists($file))
+				if (!File::exists($file))
 				{
-					JFile::write($file, $minifiedCode);
+					File::write($file, $minifiedCode);
 				}
 				else
 				{
 					if (filesize($file) == 0 || ((filemtime($file) + $cachetime * 60) < time()))
 					{
-						JFile::write($file, $minifiedCode);
+						File::write($file, $minifiedCode);
 					}
 				}
 
-				$doc->addStylesheet(JURI::base(true) . '/cache/com_templates/templates/' . self::getTemplate() . '/' . md5($md5sum) . '.css');
+				$doc->addStylesheet(Uri::base(true) . '/cache/com_templates/templates/' . self::getTemplate() . '/' . md5($md5sum) . '.css');
 			}
 		}
 

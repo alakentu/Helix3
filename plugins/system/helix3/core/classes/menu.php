@@ -1,13 +1,17 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Helper\ModuleHelper;
 
 class Helix3Menu {
 
@@ -20,7 +24,7 @@ class Helix3Menu {
 
 	function __construct($class = '', $name = '')
 	{
-		$this->app = JFactory::getApplication();
+		$this->app = Factory::getApplication();
 		$this->template = $this->app->getTemplate(true);
 		$this->_params = $this->template->params;
 		$this->extraclass = $class;
@@ -40,7 +44,7 @@ class Helix3Menu {
 
 	public function initMenu()
 	{
-		$app 	= JFactory::getApplication();
+		$app 	= Factory::getApplication();
 		$menu  	= $app->getMenu('site');
 
 		$attributes 	= array('menutype');
@@ -127,11 +131,11 @@ class Helix3Menu {
 
 			if (strcasecmp(substr($item->flink, 0, 4), 'http') && (strpos($item->flink, 'index.php?') !== false))
 			{
-				$item->flink = JRoute::_($item->flink, true, $item->getParams()->get('secure'));
+				$item->flink = Route::_($item->flink, true, $item->getParams()->get('secure'));
 			}
 			else
 			{
-				$item->flink = JRoute::_($item->flink);
+				$item->flink = Route::_($item->flink);
 			}
 
 			// We prevent the double encoding because for some reason the $item is shared for menu modules and we get double encoding
@@ -519,7 +523,7 @@ class Helix3Menu {
 		}
 
 		$flink = $item->flink;
-		$flink = str_replace('&amp;', '&', JFilterOutput::ampReplace(htmlspecialchars($flink)));
+		$flink = str_replace('&amp;', '&', OutputFilter::ampReplace(htmlspecialchars($flink)));
 
 		$output = '';
 		$options ='';
@@ -551,17 +555,18 @@ class Helix3Menu {
 	//Load Module by id or position
 	private function load_module($mod)
 	{
-		$app		= JFactory::getApplication();
-		$user		= JFactory::getUser();
+		$app		= Factory::getApplication();
+		$user		= Factory::getUser();
 		$groups		= implode(',', $user->getAuthorisedViewLevels());
-		$lang 		= JFactory::getLanguage()->getTag();
+		$lang 		= Factory::getLanguage()->getTag();
 		$clientId 	= (int) $app->getClientId();
 
-		$db	= JFactory::getDbo();
+		$db	= Factory::getDbo();
 		$query = $db->getQuery(true);
-		$query->select('id, title, module, position, content, showtitle, params');
+		$query->select('m.id, m.title, m.module, m.position, m.content, m.showtitle, m.params');
 		$query->from('#__modules AS m');
 		$query->where('m.published = 1');
+		$query->where('m.id = ' . $mod);
 
 		if (is_numeric($mod))
 		{
@@ -572,17 +577,17 @@ class Helix3Menu {
 			$query->where('m.position = "' . $mod . '"');
 		}
 
-		$date = JFactory::getDate();
+		$date = Factory::getDate();
 		$now = $date->toSql();
 		$nullDate = $db->getNullDate();
-		$query->where('(m.publish_up = '.$db->Quote($nullDate).' OR m.publish_up <= '.$db->Quote($now).')');
-		$query->where('(m.publish_down = '.$db->Quote($nullDate).' OR m.publish_down >= '.$db->Quote($now).')');
 
-		$query->where('m.access IN ('.$groups.')');
-		$query->where('m.client_id = '. $clientId);
+		$query->where('(m.publish_up IS NULL OR m.publish_up = ' . $db->Quote($nullDate) . ' OR m.publish_up <= ' . $db->Quote($now) . ')');
+		$query->where('(m.publish_down IS NULL OR m.publish_down = ' . $db->Quote($nullDate) . ' OR m.publish_down >= ' . $db->Quote($now) . ')');
+		$query->where('m.access IN (' . $groups . ')');
+		$query->where('m.client_id = ' . $clientId);
 
 		// Filter by language
-		if ($app->isSite() && $app->getLanguageFilter())
+		if ($app->isClient('site') && $app->getLanguageFilter())
 		{
 			$query->where('m.language IN (' . $db->Quote($lang) . ',' . $db->Quote('*') . ')');
 		}
@@ -607,9 +612,10 @@ class Helix3Menu {
 			$module->user		= $custom;
 			$module->name		= $custom ? $module->title : substr($file, 4);
 			$module->style		= null;
+			$module->client_id  = 1;
 			$module->position	= strtolower($module->position);
 			$clean[$module->id]	= $module;
-			echo JModuleHelper::renderModule($module, $options);
+			echo ModuleHelper::renderModule($module, $options);
 		}
 
 		$output = ob_get_clean();

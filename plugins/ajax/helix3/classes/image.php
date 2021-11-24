@@ -1,19 +1,17 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-class Helix3Image {
-
+class Helix3Image
+{
 	public static function createThumbs($src, $sizes = array(), $folder, $base_name, $ext)
 	{
-		
 		list($originalWidth, $originalHeight) = getimagesize($src);
 
 		switch($ext)

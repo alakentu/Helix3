@@ -1,20 +1,18 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-jimport('joomla.form.formfield');
+use Joomla\CMS\Form\FormField;
+use Joomla\CMS\HTML\HTMLHelper;
 
-jimport('joomla.html.html.select');
-
-class JFormFieldIcon extends JFormField {
-
+class JFormFieldIcon extends FormField
+{
 	protected $type = 'Icon';
 
 	public function getInput() {
@@ -22,13 +20,13 @@ class JFormFieldIcon extends JFormField {
 		$icons = $this->getIconsList();
 
 		$arr = array();
-		$arr[] = JHtml::_('select.option', '', '' );
+		$arr[] = HTMLHelper::_('select.option', '', '' );
 
 		foreach ($icons as $value) {
-			$arr[] = JHtml::_('select.option', $value, str_replace('fa-', '', $value) );
+			$arr[] = HTMLHelper::_('select.option', $value, str_replace('fa-', '', $value) );
 		}
 
-		return JHtml::_('select.genericlist', $arr, $this->name, null, 'value', 'text', $this->value);
+		return HTMLHelper::_('select.genericlist', $arr, $this->name, 'class="form-select"', 'value', 'text', $this->value);
 
 	}
 
@@ -754,6 +752,6 @@ class JFormFieldIcon extends JFormField {
 			'fa-window-minimize',
 			'fa-window-restore',
 			'fa-wpexplorer'
-			);
-}
+		);
+	}
 }

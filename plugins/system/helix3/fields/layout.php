@@ -1,18 +1,18 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
 
-jimport('joomla.form.formfield');
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\FormField;
 
-class JFormFieldLayout extends JFormField {
-
+class JFormFieldLayout extends FormField
+{
   protected $type = 'Layout';
 
   public function getInput()
@@ -57,8 +57,8 @@ class JFormFieldLayout extends JFormField {
   //Get template name
   private static function getTemplate()
   {
-    $id = (int) JFactory::getApplication()->input->get('id', 0);
-    $db = JFactory::getDbo();
+    $id = (int) Factory::getApplication()->input->get('id', 0);
+    $db = Factory::getDbo();
     $query = $db->getQuery(true);
     $query->select($db->quoteName(array('template')));
     $query->from($db->quoteName('#__template_styles'));

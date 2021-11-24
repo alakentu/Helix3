@@ -1,13 +1,16 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */  
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 
 class SpTypeMedia
 {
@@ -20,13 +23,13 @@ class SpTypeMedia
 		}
 
 		if($attr['std']!='') {
-			$src = 'src="' . JURI::root() .  $attr['std'] . '"';
+			$src = 'src="' . Uri::root() .  $attr['std'] . '"';
 		} else {
 			$src = '';
 		}
 
-		JHtml::_('jquery.framework');
-		// JHtml::_('behavior.modal'); // @todo
+		HTMLHelper::_('jquery.framework');
+		// HTMLHelper::_('behavior.modal'); // @todo
 		
 		$output  = '<div class="form-group">';
 		$output .= '<label>' . $attr['title'] . '</label>';
@@ -39,7 +42,7 @@ class SpTypeMedia
 		$output .= '</div>';
 
 		$output .= '<input type="hidden" data-attrname="'.$key.'" class="input-media addon-input" value="'.$attr['std'].'">';
-		$output .= '<a class="modal1 sppb-btn sppb-btn-primary" title="Select" rel="{handler: \'iframe\', size: {x: 800, y: 500}}">Select</a>';
+		$output .= '<a class="modal1 sppb-btn sppb-btn-primary" title="'.Text::_('HELIX_SELECT').'" rel="{handler: \'iframe\', size: {x: 800, y: 500}}">'.Text::_('HELIX_SELECT').'</a>';
 		$output .= ' <a class="sppb-btn sppb-btn-danger remove-media" href="#"><i class="icon-remove"></i></a>';
 		$output .= '</div>';
 

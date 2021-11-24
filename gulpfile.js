@@ -1,53 +1,94 @@
-const { src, dest, series } = require('gulp');
-const zip = require('gulp-zip');
-const clean = require('gulp-clean');
+'use strict';
 
-// Create a build
-function cleanBuild() {
-    return src('./build', {read: false, allowEmpty: true})
-        .pipe(clean());
-}
+process.env.DISABLE_NOTIFIER = true;
 
-function cleanZip() {
-    return src('./helix3_template.zip', {read: false, allowEmpty: true})
-        .pipe(clean());
-}
+const gulp	= require('gulp'),
+	  zip 	= require('gulp-zip'),
+	  clean = require('gulp-clean');
 
-function copy_template() {
-    return src(['./templates/shaper_helix3/**/*.*'])
-        .pipe(dest('build/template'));
-}
+var paths = {
+	template: {
+		src: 'templates/shaper_helix3/**/*.*',
+		dest: 'build/template'
+	},
+	tpl_language: {
+		src: 'language/en-GB/*.ini',
+		dest: 'build/template/language/en-GB'
+	},
+	plugin: {
+		src: 'plugins/system/helix3/**/*.*',
+		dest: 'build/plugins/system'
+	},
+	plg_language: {
+		src: [
+			'administrator/en-GB/en-GB.plg_system_helix3.ini',
+			'administrator/en-GB/en-GB.plg_system_helix3.sys.ini'
+		],
+		dest: 'build/plugins/system/language/en-GB'
+	},
+	ajax: {
+		src: 'plugins/ajax/helix3/**/*.*',
+		dest: 'build/plugins/ajax'
+	},
+	ajax_lang: {
+		src: [
+			'administrator/en-GB/en-GB.plg_ajax_helix3.ini',
+			'administrator/en-GB/en-GB.plg_ajax_helix3.sys.ini'
+		],
+		dest: 'build/plugins/ajax/language/en-GB'
+	},
+	installer: {
+		src: ['installer.script.php', 'installer.xml'],
+		dest: 'build'
+	},
+};
 
-function copy_template_lang() {
-    return src('./language/en-GB/en-GB.tpl_shaper_helix3.ini')
-        .pipe(dest('build/template'));
-}
+gulp.task('cleanBuild', function() {
+    return gulp.src('build', { 
+		read: false, 
+		allowEmpty: true 
+	}).pipe(clean());
+});
 
-function copy_system_plugin() {
-    return src(['./plugins/system/helix3/**/*.*'])
-        .pipe(dest('build/plugins/system'));
-}
+gulp.task('cleanZip', function() {
+    return gulp.src('dist/helix3_template.zip', { 
+		read: false, 
+		allowEmpty: true 
+	}).pipe(clean());
+});
 
-function copy_system_plugin_lang() {
-    return src('./administrator/language/en-GB/en-GB.plg_system_helix3.ini')
-        .pipe(dest('build/plugins/system/language'));
-}
+gulp.task('copyTemplate', function() {
+    return gulp.src(paths.template.src).pipe(gulp.dest(paths.template.dest));
+});
 
-function copy_ajax_plugin() {
-    return src(['./plugins/ajax/helix3/**/*.*'])
-        .pipe(dest('build/plugins/ajax'));
-}
+gulp.task('copyTemplateLang', function() {
+    return gulp.src(paths.tpl_language.src).pipe(gulp.dest(paths.tpl_language.dest));
+});
 
-function copy_installer() {
-    return src(['installer.script.php', 'installer.xml'])
-        .pipe(dest('build'));
-}
+gulp.task('copySysPlugin', function() {
+    return gulp.src(paths.plugin.src).pipe(gulp.dest(paths.plugin.dest));
+});
 
-function makeZip() {
-    return src('./build/**/*.*')
-      .pipe(zip('helix3_template.zip'))
-      .pipe(dest('./'));
-}
+gulp.task('copySysPluginLang', function() {
+    return gulp.src(paths.plg_language.src).pipe(gulp.dest(paths.plg_language.dest));
+});
 
-exports.copy = series(cleanBuild, cleanZip, copy_template, copy_template_lang, copy_system_plugin, copy_system_plugin_lang, copy_ajax_plugin, copy_installer);
-exports.default = series(exports.copy, makeZip, cleanBuild);
+gulp.task('copyAjaxPlugin', function() {
+    return gulp.src(paths.ajax.src).pipe(gulp.dest(paths.ajax.dest));
+});
+
+gulp.task('copyAjaxPluginLang', function() {
+    return gulp.src(paths.ajax_lang.src).pipe(gulp.dest(paths.ajax_lang.dest));
+});
+
+gulp.task('copyInstallers', function() {
+    return gulp.src(paths.installer.src).pipe(gulp.dest(paths.installer.dest));
+});
+
+gulp.task('makeZip', function() {
+	return gulp.src('build/**/*.*')
+		.pipe(zip("helix3_template.zip"))
+		.pipe(gulp.dest('dist'));
+});
+
+gulp.task('build', gulp.series('cleanBuild', 'cleanZip', 'copyTemplate', 'copyTemplateLang', 'copySysPlugin', 'copySysPluginLang', 'copyAjaxPlugin', 'copyAjaxPluginLang', 'copyInstallers', 'makeZip'));

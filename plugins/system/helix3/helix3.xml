@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.9" type="plugin" group="system" method="upgrade">
-    <name>System - Helix3 Framework</name>
+<extension type="plugin" group="system" method="upgrade">
+    <name>plg_system_helix3</name>
     <author>JoomShaper.com</author>
-    <creationDate>Jan 2015</creationDate>
-    <copyright>Copyright (c) 2010 - 2020 JoomShaper. All rights reserved.</copyright>
+    <creationDate>November 2021</creationDate>
+    <copyright>Copyright (c) 2010 - 2021 JoomShaper. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
     <authorEmail>support@joomshaper.com</authorEmail>
     <authorUrl>www.joomshaper.com</authorUrl>
-    <version>3.0.0</version>
-    <description>Helix3 Framework - Joomla Template Framework by JoomShaper</description>
+    <version>3.0.1</version>
+    <description>PLG_SYSTEM_HELIX3_XML_DESCRIPTION</description>
 
     <updateservers>
-        <server type="extension" priority="1" name="System - Helix3 Framework">http://www.joomshaper.com/updates/plg-system-helix3.xml</server>
+        <server type="extension" priority="1" name="System - Helix3 Framework">https://www.joomshaper.com/updates/plg-system-helix3.xml</server>
     </updateservers>
 
-    <languages>
-        <language tag="en-GB">language/en-GB.plg_system_helix3.ini</language>
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.plg_system_helix3.ini</language>
+        <language tag="en-GB">en-GB/en-GB.plg_system_helix3.sys.ini</language>
     </languages>
 
     <files>
 		<filename plugin="helix3">helix3.php</filename>
-		<folder plugin="helix3">assets</folder>
-		<folder plugin="helix3">core</folder>
-        <folder plugin="helix3">fields</folder>
-        <folder plugin="helix3">layout</folder>
-        <folder plugin="helix3">layouts</folder>
-		<folder plugin="helix3">params</folder>
+		<folder>assets</folder>
+		<folder>core</folder>
+        <folder>fields</folder>
+        <folder>layout</folder>
+        <folder>layouts</folder>
+		<folder>params</folder>
     </files>
+    
     <fieldset addfieldpath="/plugins/system/helix3/fields"></fieldset>
 </extension>

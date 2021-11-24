@@ -1,16 +1,15 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  mod_menu
- *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
- */
+ * @package Helix3 Framework
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or later
+*/
 
 defined('_JEXEC') or die;
 
 // get item params and decode it
-$item_decode = json_decode($item->params);
+$item_decode = json_decode($item->getParams());
 
 // Note. It is important to remove spaces between elements.
 $class = $item->anchor_css ? 'class="' . $item->anchor_css . '" ' : '';
@@ -18,7 +17,7 @@ $title = $item->anchor_title ? 'title="' . $item->anchor_title . '" ' : '';
 
 if ($item->menu_image)
 {
-	$item->params->get('menu_text', 1) ?
+	$item->getParams()->get('menu_text', 1) ?
 	$linktype = '<img src="' . $item->menu_image . '" alt="' . $item->title . '" /><span class="image-title">' . $item->title . '</span> ' :
 	$linktype = '<img src="' . $item->menu_image . '" alt="' . $item->title . '" />';
 }
@@ -50,5 +49,5 @@ switch ($item->browserNav)
 }
 
 if(($module->position == 'offcanvas') && ($item->deeper)) {
-	echo '<span class="offcanvas-menu-toggler collapsed" data-toggle="collapse" data-target="#collapse-menu-'. $item->id .'"><i class="open-icon fa fa-angle-down"></i><i class="close-icon fa fa-angle-up"></i></span>';
+	echo '<span class="offcanvas-menu-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-menu-'. $item->id .'"><i class="open-icon fa fa-angle-down"></i><i class="close-icon fa fa-angle-up"></i></span>';
 }

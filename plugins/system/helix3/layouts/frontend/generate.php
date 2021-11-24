@@ -1,13 +1,15 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-defined('_JEXEC') or die('Restricted Access');
 
-//
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Layout\FileLayout;
 
 //helper & model
 $menu_class   = JPATH_ROOT . '/plugins/system/helix3/core/classes/helix3.php';
@@ -16,7 +18,7 @@ if (file_exists($menu_class)) {
     require_once($menu_class);
 }
 
-$template       = JFactory::getApplication()->getTemplate();
+$template       = Factory::getApplication()->getTemplate();
 $themepath      = JPATH_THEMES . '/' . $template;
 $rows_file      = $themepath . '/html/layouts/helix3/frontend/rows.php';
 $lyt_thm_path   = $themepath . '/html/layouts/helix3/';
@@ -41,7 +43,7 @@ else{
 }
 
 
-$getLayout = new JLayoutFile('frontend.rows', $layout_path );
+$getLayout = new FileLayout('frontend.rows', $layout_path );
 
 $output .= $getLayout->render($data);
 

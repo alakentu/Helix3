@@ -1,13 +1,14 @@
 <?php
 /**
 * @package Helix3 Framework
-* @author JoomShaper http://www.joomshaper.com
-* @copyright Copyright (c) 2010 - 2020 JoomShaper
+* @author JoomShaper https://www.joomshaper.com
+* @copyright (c) 2010 - 2021 JoomShaper
 * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die ('resticted aceess');
+defined('_JEXEC') or die;
+
+use Joomla\CMS\HTML\HTMLHelper;
 
 class SpTypeColor{
 
@@ -19,8 +20,8 @@ class SpTypeColor{
 		}
 
 		// Including fallback code for HTML5 non supported browsers.
-		JHtml::_('jquery.framework');
-		JHtml::_('script', 'system/html5fallback.js', false, true);
+		HTMLHelper::_('jquery.framework');
+		HTMLHelper::_('script', 'system/html5fallback.js', false, true);
 
 		$output  = '<div class="form-group">';
 		$output .= '<label>'.$attr['title'].'</label>';

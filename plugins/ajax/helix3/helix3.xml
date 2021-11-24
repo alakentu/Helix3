@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.9" type="plugin" group="ajax" method="upgrade">
-	<name>Helix3 - Ajax</name>
+<extension type="plugin" group="ajax" method="upgrade">
+	<name>plg_ajax_helix3</name>
 	<author>JoomShaper.com</author>
-    <creationDate>Jan 2015</creationDate>
-    <copyright>Copyright (c) 2010 - 2020 JoomShaper. All rights reserved.</copyright>
+    <creationDate>November 2021</creationDate>
+    <copyright>Copyright (c) 2010 - 2021 JoomShaper. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
     <authorEmail>support@joomshaper.com</authorEmail>
     <authorUrl>www.joomshaper.com</authorUrl>
-    <version>3.0.0</version>
-    <description>Helix3 Framework - Joomla Template Framework by JoomShaper</description>
+    <version>3.0.1</version>
+    <description>PLG_AJAX_HELIX3_XML_DESCRIPTION</description>
 
     <updateservers>
         <server type="extension" priority="1" name="Helix3 - Ajax">http://www.joomshaper.com/updates/plg-ajax-helix3.xml</server>
     </updateservers>
+    
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.plg_ajax_helix3.ini</language>
+        <language tag="en-GB">en-GB/en-GB.plg_ajax_helix3.sys.ini</language>
+    </languages>
 
 	<files>
         <filename plugin="helix3">helix3.php</filename>
-		<folder>classes/</folder>
+		<folder>classes</folder>
 	</files>
 </extension>

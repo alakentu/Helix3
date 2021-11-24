@@ -1,25 +1,26 @@
 <?php
 /**
  * @package Helix3 Framework
- * @author JoomShaper http://www.joomshaper.com
- * @copyright Copyright (c) 2010 - 2020 JoomShaper
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-//no direct accees
-defined ('_JEXEC') or die('resticted aceess');
+
+defined('_JEXEC') or die;
 
 class Helix3FeatureFooter {
 
 	private $helix3;
 
-	public function __construct($helix3){
+	public function __construct($helix3)
+	{
 		$this->helix3 = $helix3;
 		$this->position = $this->helix3->getParam('copyright_position');
 		$this->load_pos = $this->helix3->getParam('copyright_load_pos');
 	}
 
-	public function renderFeature() {
-
+	public function renderFeature()
+	{
 		if($this->helix3->getParam('enabled_copyright')) {
 			$output = '';
 			//Copyright
@@ -29,6 +30,5 @@ class Helix3FeatureFooter {
 			
 			return $output;
 		}
-		
 	}    
 }

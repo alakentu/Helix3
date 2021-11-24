@@ -1,12 +1,15 @@
 <?php
 /**
  * @package Helix3 Framework
- * @author JoomShaper http://www.joomshaper.com
- * @copyright Copyright (c) 2010 - 2020 JoomShaper
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-//no direct accees
-defined ('_JEXEC') or die('resticted aceess');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
 
 class Helix3FeatureTitle {
 
@@ -19,7 +22,7 @@ class Helix3FeatureTitle {
 
 	public function renderFeature() {
 
-		$app 		= JFactory::getApplication();
+		$app 		= Factory::getApplication();
 		$menuitem   = $app->getMenu()->getActive(); // get the active item
 
 		if($menuitem) {
@@ -41,7 +44,7 @@ class Helix3FeatureTitle {
 				}
 
 				if($page_title_bg_image) {
-					$style .= 'background-image: url(' . JURI::root(true) . '/' . $page_title_bg_image . ');';
+					$style .= 'background-image: url(' . Uri::root(true) . '/' . $page_title_bg_image . ');';
 				}
 
 				if( $style ) {
@@ -69,10 +72,7 @@ class Helix3FeatureTitle {
 				$output .= '</div>';
 
 				return $output;
-
 			}
-
 		}
-
 	}
 }

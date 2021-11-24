@@ -1,33 +1,38 @@
 <?php
 /**
  * @package Helix3 Framework
- * @author JoomShaper http://www.joomshaper.com
- * @copyright Copyright (c) 2010 - 2020 JoomShaper
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
 
-//no direct accees
-defined ('_JEXEC') or die('resticted aceess');
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 class Helix3FeaturePreloader {
 
 	private $helix3;
 
-	public function __construct($helix){
+	public function __construct($helix)
+	{
 		$this->helix3 = $helix;
 		$this->position = 'helixpreloader';
 	}
 
-	public function renderFeature() {
-
-		$app = JFactory::getApplication();
+	public function renderFeature()
+	{
+		$app = Factory::getApplication();
 		//Load Helix
 		$helix3_path = JPATH_PLUGINS . '/system/helix3/core/helix3.php';
 		if (file_exists($helix3_path)) {
 			require_once($helix3_path);
 			$getHelix3 = helix3::getInstance();
 		} else {
-			die('Please install and activate helix plugin');
+			die(Text::_('HELIX_PLUGIN_WARNING_NOTICE'));
 		}
 
 		$output = '';
@@ -64,9 +69,9 @@ class Helix3FeaturePreloader {
                 } elseif ($getHelix3->getParam('preloader_animation') == 'logo') {
 
                     if ($getHelix3->getParam('logo_image')) {
-                        $logo = JUri::root() . '/' . $getHelix3->getParam('logo_image');
+                        $logo = Uri::root() . '/' . $getHelix3->getParam('logo_image');
                     } else {
-                        $logo = JUri::root() . '/templates/' . $app->getTemplate() . '/images/presets/' . $getHelix3->Preset() . '/logo.png';
+                        $logo = Uri::root() . '/templates/' . $app->getTemplate() . '/images/presets/' . $getHelix3->Preset() . '/logo.png';
                     }
 
                     // Line loader with logo
@@ -82,9 +87,7 @@ class Helix3FeaturePreloader {
                     $output .= '<div class="sp-loader-circle"></div>'; // /.Circular loader
                 }
             $output .= '</div>'; // /.Pre-loader
-
         } // if enable preloader
-
         echo $output;
 	} //renderFeature
 }

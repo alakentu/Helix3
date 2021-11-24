@@ -1,24 +1,25 @@
 <?php
 /**
  * @package Helix3 Framework
- * @author JoomShaper http://www.joomshaper.com
- * @copyright Copyright (c) 2010 - 2020 JoomShaper
+ * @author JoomShaper https://www.joomshaper.com
+ * @copyright (c) 2010 - 2021 JoomShaper
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 or Later
 */
-//no direct accees
-defined ('_JEXEC') or die('resticted aceess');
+
+defined('_JEXEC') or die;
 
 class Helix3FeatureContact {
 
 	private $helix3;
 
-	public function __construct($helix3){
+	public function __construct($helix3)
+	{
 		$this->helix3 = $helix3;
 		$this->position = $this->helix3->getParam('contact_position');
 	}
 
-	public function renderFeature() {
-
+	public function renderFeature()
+	{
 		if($this->helix3->getParam('enable_contactinfo')) {
 
 			$output = '<ul class="sp-contact-info">';
@@ -30,6 +31,5 @@ class Helix3FeatureContact {
 
 			return $output;
 		}
-		
 	}    
 }
